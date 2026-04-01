@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omnia — Film once. Publish everywhere. Learn what wins.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --lime: #c8ff00;
+      --lime-dim: rgba(200, 255, 0, 0.12);
+      --lime-glow: rgba(200, 255, 0, 0.35);
+      --black: #000000;
+      --off-black: #0a0a0a;
+      --gray-900: #111111;
+      --gray-700: #1c1c1c;
+      --gray-500: #333333;
+      --gray-300: #888888;
+      --gray-100: #cccccc;
+      --white: #ffffff;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.5;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 0.12em;
+      color: var(--white);
+    }
+
+    .nav-logo span {
+      color: var(--lime);
+    }
+
+    .nav-pill {
+      background: var(--lime-dim);
+      border: 1px solid rgba(200, 255, 0, 0.25);
+      color: var(--lime);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 8px 20px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-pill:hover {
+      background: rgba(200, 255, 0, 0.2);
+      box-shadow: 0 0 20px var(--lime-glow);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      overflow: hidden;
+    }
+
+    /* Radial glow behind headline */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(200,255,0,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Cinematic horizontal scan lines */
+    .hero-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(255,255,255,0.012) 3px,
+        rgba(255,255,255,0.012) 4px
+      );
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--lime);
+      opacity: 0.6;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 11vw, 160px);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--white);
+      max-width: 1100px;
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.4s forwards;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--lime);
+      position: relative;
+    }
+
+    /* Underline flicker on accent */
+    h1 em::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--lime);
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: underlineIn 0.6s ease 1.4s forwards;
+    }
+
+    .hero-sub {
+      margin-top: 36px;
+      font-size: clamp(15px, 1.6vw, 18px);
+      font-weight: 300;
+      color: var(--gray-300);
+      max-width: 540px;
+      line-height: 1.75;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+
+    /* ── WAITLIST FORM ── */
+    .waitlist {
+      margin-top: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.9s forwards;
+    }
+
+    .waitlist-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--gray-900);
+      border: 1px solid var(--gray-500);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .waitlist-row:focus-within {
+      border-color: var(--lime);
+      box-shadow: 0 0 0 3px var(--lime-dim), 0 0 32px var(--lime-glow);
+    }
+
+    .waitlist-row input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 16px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--white);
+      min-width: 0;
+    }
+
+    .waitlist-row input::placeholder {
+      color: var(--gray-300);
+    }
+
+    .waitlist-row button {
+      flex-shrink: 0;
+      background: var(--lime);
+      border: none;
+      padding: 16px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--black);
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+
+    .waitlist-row button:hover {
+      background: #d4ff1a;
+      box-shadow: 0 0 24px var(--lime-glow);
+    }
+
+    .waitlist-row button:active {
+      background: #b8e800;
+    }
+
+    .waitlist-note {
+      font-size: 12px;
+      color: var(--gray-300);
+      letter-spacing: 0.04em;
+    }
+
+    .waitlist-note strong {
+      color: var(--gray-100);
+      font-weight: 500;
+    }
+
+    /* ── SOCIAL PROOF ── */
+    .social-proof {
+      margin-top: 72px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.1s forwards;
+    }
+
+    .avatars {
+      display: flex;
+    }
+
+    .avatars span {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      margin-left: -8px;
+      background: var(--gray-700);
+      color: var(--gray-100);
+    }
+
+    .avatars span:first-child { margin-left: 0; background: #1a1a2e; }
+    .avatars span:nth-child(2) { background: #16213e; }
+    .avatars span:nth-child(3) { background: #0f3460; }
+    .avatars span:nth-child(4) { background: #1a1a1a; }
+
+    .social-text {
+      font-size: 13px;
+      color: var(--gray-300);
+      line-height: 1.5;
+    }
+
+    .social-text strong {
+      color: var(--lime);
+      font-weight: 600;
+    }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeIn 1s ease 1.6s forwards;
+    }
+
+    .scroll-hint span {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--lime), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* ── FEATURES STRIP ── */
+    .features {
+      padding: 100px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .features-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 60px;
+      text-align: center;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .feature-card {
+      background: var(--gray-900);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: transparent;
+      transition: background 0.3s;
+    }
+
+    .feature-card:hover {
+      background: #111;
+    }
+
+    .feature-card:hover::before {
+      background: linear-gradient(to right, transparent, var(--lime), transparent);
+    }
+
+    .feature-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: var(--lime);
+      opacity: 0.5;
+      margin-bottom: 28px;
+    }
+
+    .feature-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--gray-300);
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      padding: 100px 48px;
+      background: var(--off-black);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .how::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gray-500), transparent);
+    }
+
+    .how-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .section-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 80px);
+      letter-spacing: 0.03em;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 72px;
+    }
+
+    .section-heading span {
+      color: var(--lime);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: calc(16.66% + 12px);
+      right: calc(16.66% + 12px);
+      height: 1px;
+      background: linear-gradient(to right, var(--lime-dim), var(--lime-dim));
+      border-top: 1px dashed rgba(200,255,0,0.2);
+    }
+
+    .step {
+      position: relative;
+    }
+
+    .step-dot {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--black);
+      border: 1px solid var(--gray-500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      color: var(--lime);
+      margin-bottom: 28px;
+      position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .step:hover .step-dot {
+      border-color: var(--lime);
+      box-shadow: 0 0 20px var(--lime-glow);
+    }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--gray-300);
+      line-height: 1.75;
+    }
+
+    /* ── PLATFORM LOGOS ── */
+    .platforms {
+      padding: 80px 48px;
+      text-align: center;
+      border-top: 1px solid var(--gray-700);
+      border-bottom: 1px solid var(--gray-700);
+    }
+
+    .platforms-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gray-300);
+      margin-bottom: 48px;
+    }
+
+    .platform-list {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .platform-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.12em;
+      color: var(--gray-500);
+      transition: color 0.2s;
+      cursor: default;
+    }
+
+    .platform-item:hover {
+      color: var(--lime);
+    }
+
+    /* ── QUOTE ── */
+    .quote-section {
+      padding: 140px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-section::before {
+      content: '"';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 400px;
+      color: rgba(200,255,0,0.025);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    blockquote {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 5vw, 64px);
+      letter-spacing: 0.04em;
+      line-height: 1.15;
+      color: var(--white);
+      max-width: 900px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+
+    blockquote span {
+      color: var(--lime);
+    }
+
+    cite {
+      font-style: normal;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gray-300);
+    }
+
+    /* ── BOTTOM CTA ── */
+    .bottom-cta {
+      padding: 120px 48px;
+      background: var(--gray-900);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bottom-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--lime), transparent);
+    }
+
+    .bottom-cta-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(200,255,0,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .bottom-cta h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 7vw, 96px);
+      letter-spacing: 0.03em;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .bottom-cta h2 span {
+      color: var(--lime);
+    }
+
+    .bottom-cta p {
+      font-size: 16px;
+      color: var(--gray-300);
+      margin-bottom: 52px;
+      position: relative;
+    }
+
+    .bottom-cta .waitlist {
+      opacity: 1;
+      animation: none;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--gray-700);
+    }
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.12em;
+      color: var(--gray-300);
+    }
+
+    .footer-logo span { color: var(--lime); }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--lime); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--gray-500);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes underlineIn {
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.1); }
+    }
+
+    /* ── INTERSECTION OBSERVER REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+
+      .features-grid,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .steps::before { display: none; }
+
+      .platform-list { gap: 28px; }
+
+      footer {
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+      }
+
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+
+    /* ── SUCCESS STATE ── */
+    .success-msg {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--lime);
+      font-weight: 500;
+    }
+
+    .success-msg.show {
+      display: flex;
+    }
+
+    .success-msg svg {
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">OMNI<span>A</span></div>
+    <button class="nav-pill" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">
+      Join Waitlist
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-scanlines"></div>
+
+    <div class="hero-eyebrow">The Future of Content Creation</div>
+
+    <h1>Film once.<br /><em>Publish</em> everywhere.<br />Learn what wins.</h1>
+
+    <p class="hero-sub">
+      One recording. Every platform. Real intelligence on what actually grows your audience — so you stop guessing and start compounding.
+    </p>
+
+    <div class="waitlist" id="waitlist">
+      <div class="waitlist-row">
+        <input type="email" id="hero-email" placeholder="your@email.com" autocomplete="email" />
+        <button onclick="handleSignup('hero-email', 'hero-success')">Get Early Access</button>
+      </div>
+      <div class="success-msg" id="hero-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        You're on the list. We'll be in touch.
+      </div>
+      <span class="waitlist-note">
+        <strong>1,240+ creators</strong> already waiting &nbsp;·&nbsp; No spam, ever.
+      </span>
+    </div>
+
+    <div class="social-proof">
+      <div class="avatars">
+        <span>🎬</span>
+        <span>✨</span>
+        <span>🎯</span>
+        <span>🚀</span>
+      </div>
+      <div class="social-text">
+        Trusted by creators building<br /><strong>audiences worth owning</strong>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- PLATFORM LOGOS -->
+  <div class="platforms reveal">
+    <div class="platforms-label">Publish natively to every platform</div>
+    <div class="platform-list">
+      <div class="platform-item">YouTube</div>
+      <div class="platform-item">TikTok</div>
+      <div class="platform-item">Instagram</div>
+      <div class="platform-item">LinkedIn</div>
+      <div class="platform-item">X / Twitter</div>
+      <div class="platform-item">Threads</div>
+      <div class="platform-item">Snapchat</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="features-label">Why Omnia</div>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-number">01</div>
+        <div class="feature-title">One Take,<br />Seven Platforms</div>
+        <p class="feature-desc">Record once. Omnia automatically reformats, resizes, and optimizes your content for every platform — captions, aspect ratios, hooks included.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-number">02</div>
+        <div class="feature-title">Intelligence That<br />Compounds</div>
+        <p class="feature-desc">Track exactly which hooks, formats, and topics drive growth. Omnia learns your audience and surfaces the patterns behind your best content.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-number">03</div>
+        <div class="feature-title">Schedule at<br />Peak Moments</div>
+        <p class="feature-desc">AI-powered timing analyzes when your specific audience is most active across each platform — then publishes automatically at the right moment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <div class="how-inner">
+      <h2 class="section-heading reveal">How it <span>works</span></h2>
+      <div class="steps">
+        <div class="step reveal reveal-delay-1">
+          <div class="step-dot">1</div>
+          <div class="step-title">Upload your raw footage</div>
+          <p class="step-desc">Drop in your recording — long-form, short-form, podcast, or screen capture. Omnia handles the rest.</p>
+        </div>
+        <div class="step reveal reveal-delay-2">
+          <div class="step-dot">2</div>
+          <div class="step-title">AI formats for every platform</div>
+          <p class="step-desc">Captions, thumbnails, titles, descriptions, hashtags — generated and tuned to each platform's algorithm.</p>
+        </div>
+        <div class="step reveal reveal-delay-3">
+          <div class="step-dot">3</div>
+          <div class="step-title">Publish, track, and win</div>
+          <p class="step-desc">Schedule and publish with one click. Then watch a unified dashboard tell you exactly what's working.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote-section reveal">
+    <blockquote>
+      "Creators who understand their data<br />
+      <span>grow 4x faster</span> than those who don't."
+    </blockquote>
+    <cite>2024 Creator Economy Report &nbsp;·&nbsp; Omnia Research</cite>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta">
+    <div class="bottom-cta-glow"></div>
+    <h2 class="reveal">Your content.<br /><span>Everywhere it belongs.</span></h2>
+    <p class="reveal">Be first when we launch. No credit card. No commitment.</p>
+
+    <div class="waitlist reveal">
+      <div class="waitlist-row">
+        <input type="email" id="footer-email" placeholder="your@email.com" autocomplete="email" />
+        <button onclick="handleSignup('footer-email', 'footer-success')">Claim My Spot</button>
+      </div>
+      <div class="success-msg" id="footer-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        You're on the list. We'll be in touch.
+      </div>
+      <span class="waitlist-note">Join <strong>1,240+ creators</strong> on the waitlist.</span>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">OMNI<span>A</span></div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="footer-copy">&copy; 2025 Omnia. All rights reserved.</div>
+  </footer>
+
+  <script>
+    // Intersection observer for scroll reveals
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Waitlist signup handler
+    function handleSignup(inputId, successId) {
+      const input = document.getElementById(inputId);
+      const success = document.getElementById(successId);
+      const email = input.value.trim();
+
+      if (!email || !email.includes('@')) {
+        input.style.outline = '2px solid #ff4444';
+        input.focus();
+        setTimeout(() => input.style.outline = '', 1000);
+        return;
+      }
+
+      // In production: POST to your backend here
+      const row = input.closest('.waitlist-row');
+      row.style.display = 'none';
+      success.classList.add('show');
+    }
+
+    // Enter key support
+    document.querySelectorAll('.waitlist-row input').forEach(input => {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          input.closest('.waitlist-row').querySelector('button').click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
