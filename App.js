@@ -69,8 +69,8 @@ var COPY = {
     finishCta: 'Start over',
   },
   es: {
-    welcomeTitle: 'Construye la marca que solo tu puedes construir.',
-    welcomeSubtitle: 'Lazo es tu copiloto de IA para emprendedores y creadores latinos - tu voz, tu historia, a tu manera.',
+    welcomeTitle: 'Construye la marca que solo tú puedes construir.',
+    welcomeSubtitle: 'Lazo es tu co-piloto de IA para emprendedores y creadores latinos — tu voz, tu historia, a tu manera.',
     welcomeCta: 'Empecemos',
     nameTitle: 'Como te llamamos?',
     nameSubtitle: 'Tu nombre o el de tu marca - como te conoce la gente.',
@@ -133,7 +133,7 @@ export default function App() {
   var story = storyState[0];
   var setStory = storyState[1];
 
-  var lang = language || 'en';
+  var lang = language || 'es';
   var copy = COPY[lang];
 
   var progress = useMemo(function () {
